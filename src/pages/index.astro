@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TerminalHero from '../components/TerminalHero.astro';
+import PostRow from '../components/PostRow.astro';
+import ProjectBlock from '../components/ProjectBlock.astro';
+import VideoCard from '../components/VideoCard.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 4);
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 2);
+
+const videos = (await getCollection('videos'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 2);
+---
+
+<BaseLayout title="الرئيسية">
+  <TerminalHero />
+
+  <section aria-labelledby="latest-posts">
+    <h2 id="latest-posts">آخر التدوينات</h2>
+    <div class="listing-head">total {posts.length}</div>
+    {posts.map((post) => (
+      <PostRow
+        slug={post.slug}
+        title={post.data.title}
+        description={post.data.description}
+        pubDate={post.data.pubDate}
+      />
+    ))}
+    <p style="margin-top:1.2rem"><a href="/blog/">كل التدوينات ←</a></p>
+  </section>
+
+  <section aria-labelledby="featured-projects" style="margin-top:3.5rem">
+    <h2 id="featured-projects">مشاريع مختارة</h2>
+    {projects.map((project) => (
+      <ProjectBlock
+        title={project.data.title}
+        summary={project.data.summary}
+        stack={project.data.stack}
+        status={project.data.status}
+        repoUrl={project.data.repoUrl}
+        releaseUrl={project.data.releaseUrl}
+      />
+    ))}
+    <p style="margin-top:1rem"><a href="/projects/">كل المشاريع ←</a></p>
+  </section>
+
+  <section aria-labelledby="latest-videos" style="margin-top:3.5rem">
+    <h2 id="latest-videos">آخر الفيديوهات</h2>
+    <div class="video-grid">
+      {videos.map((video) => (
+        <VideoCard
+          title={video.data.title}
+          description={video.data.description}
+          youtubeId={video.data.youtubeId}
+          pubDate={video.data.pubDate}
+        />
+      ))}
+    </div>
+    <p style="margin-top:1.2rem"><a href="/videos/">كل الفيديوهات ←</a></p>
+  </section>
+</BaseLayout>

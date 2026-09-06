@@ -1,0 +1,54 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  youtubeId: string;
+  pubDate: Date;
+}
+const { title, description, youtubeId, pubDate } = Astro.props;
+
+const formatted = new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+}).format(pubDate);
+---
+
+<article class="video-card">
+  <button
+    class="video-thumb"
+    type="button"
+    data-youtube-id={youtubeId}
+    aria-label={`تشغيل: ${title}`}
+  >
+    <img
+      src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
+      alt=""
+      loading="lazy"
+      width="480"
+      height="360"
+    />
+    <span class="play-badge" aria-hidden="true">▶</span>
+  </button>
+  <div class="video-meta">
+    <h3>{title}</h3>
+    <p class="summary">{description}</p>
+    <span class="date">{formatted}</span>
+  </div>
+</article>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.video-thumb').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.youtubeId;
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+      iframe.setAttribute('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.width = '100%';
+      iframe.height = '100%';
+      iframe.style.border = '0';
+      btn.replaceWith(iframe);
+    }, { once: true });
+  });
+</script>

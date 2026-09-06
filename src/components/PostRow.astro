@@ -1,0 +1,24 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+}
+const { slug, title, description, pubDate } = Astro.props;
+
+const formatted = new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+}).format(pubDate);
+---
+
+<article class="post-row">
+  <span class="perm">-rw-r--r--</span>
+  <span class="title">
+    <a href={`/blog/${slug}/`}>{title}</a>
+    <span class="meta">{description}</span>
+  </span>
+  <time class="date" datetime={pubDate.toISOString()}>{formatted}</time>
+</article>

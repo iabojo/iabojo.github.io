@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectBlock from '../../components/ProjectBlock.astro';
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="المشاريع" description="مشاريع برمجية — تطبيقات أندرويد وأدوات.">
+  <h1>المشاريع</h1>
+  {projects.map((project) => (
+    <ProjectBlock
+      title={project.data.title}
+      summary={project.data.summary}
+      stack={project.data.stack}
+      status={project.data.status}
+      repoUrl={project.data.repoUrl}
+      releaseUrl={project.data.releaseUrl}
+    />
+  ))}
+</BaseLayout>

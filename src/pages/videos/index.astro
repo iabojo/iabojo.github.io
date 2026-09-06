@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import VideoCard from '../../components/VideoCard.astro';
+
+const videos = (await getCollection('videos'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="الفيديوهات" description="شروحات فيديو — لينكس، FreeBSD، Sketchware، والبرمجة أثناء التنقل.">
+  <h1>الفيديوهات</h1>
+  <p>شروحات من قناتي على يوتيوب — لينكس وFreeBSD، Sketchware، وCode on the go.</p>
+  <div class="video-grid">
+    {videos.map((video) => (
+      <VideoCard
+        title={video.data.title}
+        description={video.data.description}
+        youtubeId={video.data.youtubeId}
+        pubDate={video.data.pubDate}
+      />
+    ))}
+  </div>
+</BaseLayout>

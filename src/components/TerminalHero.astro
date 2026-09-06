@@ -1,0 +1,57 @@
+---
+interface Props {
+  command?: string;
+  path?: string;
+}
+const { command = 'whoami --verbose', path = '~/aisyd' } = Astro.props;
+---
+
+<div class="terminal" id="hero-terminal">
+  <div class="terminal-titlebar">
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="path">{path} — bash</span>
+  </div>
+  <div class="terminal-body">
+    <p class="terminal-line">
+      <span class="prompt">$</span> <span id="hero-cmd"></span><span class="caret" id="hero-caret"></span>
+    </p>
+    <div class="terminal-output" id="hero-output" hidden>
+      <h1>abojo</h1>
+      <p class="role">مطوّر ومدوّن تقني — أنظمة BSD، أمن الشبكات، وتطبيقات أندرويد.</p>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ command }}>
+  const cmdEl = document.getElementById('hero-cmd');
+  const caretEl = document.getElementById('hero-caret');
+  const outputEl = document.getElementById('hero-output');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function reveal() {
+    cmdEl.textContent = command;
+    outputEl.hidden = false;
+    if (caretEl) caretEl.style.display = 'none';
+  }
+
+  if (prefersReducedMotion) {
+    reveal();
+  } else {
+    let i = 0;
+    const type = () => {
+      if (i <= command.length) {
+        cmdEl.textContent = command.slice(0, i);
+        i++;
+        setTimeout(type, 45);
+      } else {
+        setTimeout(() => {
+          outputEl.hidden = false;
+          if (caretEl) caretEl.style.display = 'none';
+        }, 300);
+      }
+    };
+    type();
+  }
+</script>

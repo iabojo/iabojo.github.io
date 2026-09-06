@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostRow from '../../components/PostRow.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="المدونة" description="كل التدوينات — أنظمة، أمن، وبرمجة.">
+  <h1>المدونة</h1>
+  <div class="listing-head">ls -la ~/blog/ — total {posts.length}</div>
+  {posts.map((post) => (
+    <PostRow
+      slug={post.slug}
+      title={post.data.title}
+      description={post.data.description}
+      pubDate={post.data.pubDate}
+    />
+  ))}
+</BaseLayout>
