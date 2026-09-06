@@ -9,11 +9,11 @@ interface Props {
 
 const {
   title,
-  description = 'مدونة إلكترونية — أنظمة BSD، أمن الشبكات، وتطبيقات أندرويد.',
+  description = 'مدونة مدونة أبو جودي — أنظمة BSD، أمن الشبكات، وتطبيقات أندرويد.',
   ogImage = '/og-default.png',
 } = Astro.props;
 
-const pageTitle = title === 'الرئيسية' ? 'إلكترونية' : `${title} · إلكترونية`;
+const pageTitle = title === 'الرئيسية' ? 'مدونة أبو جودي' : `${title} · مدونة أبو جودي`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -46,7 +46,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <body>
   <header class="site-header">
     <div class="wrap bar">
-      <a href="/" class="brand">abojo <span aria-hidden="true" style="direction:ltr">// @iabojo</span></a>
+      <a href="/" class="brand">مدونة أبو جودي <span aria-hidden="true" style="direction:ltr">// @iabojo</span></a>
       <nav class="main-nav" aria-label="التصفح الرئيسي">
         <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>الرئيسية</a>
         <a href="/blog/" aria-current={Astro.url.pathname.startsWith('/blog') ? 'page' : undefined}>المدونة</a>
@@ -63,7 +63,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <footer class="site-footer">
     <div class="wrap">
       <span>&copy; {new Date().getFullYear()} abojo</span>
-      <span>built with astro · hosted on github pages</span>
     </div>
   </footer>
 </body>
