@@ -1,26 +1,46 @@
 import { defineCollection, z } from 'astro:content';
 
+const optionalText = z
+  .string()
+  .optional()
+  .transform((v) => v?.trim() || undefined);
+
 const blog = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    description: z.string(),
+    description: z.string().default(''),
     pubDate: z.coerce.date(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
   }),
 });
 
-const projects = defineCollection({
+const khawater = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: optionalText,
+    pubDate: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const books = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    summary: z.string(),
-    stack: z.array(z.string()).default([]),
-    status: z.enum(['active', 'done', 'planned']).default('active'),
-    repoUrl: z.string().url().optional(),
-    releaseUrl: z.string().url().optional(),
-    order: z.number().default(0),
+    author: z.string(),
+    status: z.enum(['reading', 'finished', 'wishlist']).default('finished'),
+    cover: optionalText,
+    downloadUrl: optionalText.refine(
+      (v) => v === undefined || /^https?:\/\//i.test(v),
+      'downloadUrl must start with http:// or https://',
+    ),
+    rating: z.number().int().min(1).max(5).optional(),
+    date: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
   }),
 });
 
@@ -35,4 +55,4 @@ const videos = defineCollection({
   }),
 });
 
-export const collections = { blog, projects, videos };
+export const collections = { blog, khawater, books, videos };

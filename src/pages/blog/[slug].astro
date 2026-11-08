@@ -1,6 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagList from '../../components/TagList.astro';
+import { cleanTags, formatDate } from '../../lib/content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -12,19 +14,14 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
-
-const formatted = new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
-  year: 'numeric',
-  month: 'long',
-  day: '2-digit',
-}).format(post.data.pubDate);
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description}>
+<BaseLayout title={post.data.title} description={post.data.description || undefined}>
   <article class="prose">
     <header class="post-header">
-      <span class="date-tag">{formatted}</span>
+      <span class="date-tag">{formatDate(post.data.pubDate, 'long')}</span>
       <h1>{post.data.title}</h1>
+      <TagList tags={cleanTags(post.data.tags)} />
     </header>
     <Content />
   </article>

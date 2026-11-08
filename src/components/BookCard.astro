@@ -1,0 +1,68 @@
+---
+import TagList from './TagList.astro';
+import { formatDate } from '../lib/content';
+
+interface Props {
+  slug: string;
+  title: string;
+  author: string;
+  status: 'reading' | 'finished' | 'wishlist';
+  cover?: string;
+  downloadUrl?: string;
+  rating?: number;
+  date: Date;
+  tags?: string[];
+  hasOpinion?: boolean;
+}
+const {
+  slug,
+  title,
+  author,
+  status,
+  cover,
+  downloadUrl,
+  rating,
+  date,
+  tags = [],
+  hasOpinion = false,
+} = Astro.props;
+
+const STATUS_LABELS = {
+  reading: 'أقرؤه حاليًا',
+  finished: 'قرأته',
+  wishlist: 'في قائمة القراءة',
+};
+---
+
+<article class="book" id={slug}>
+  <div class="book-cover">
+    {cover ? (
+      <img src={cover} alt={`غلاف كتاب ${title}`} loading="lazy" decoding="async" />
+    ) : (
+      <div class="book-cover-ph" aria-hidden="true">📖</div>
+    )}
+  </div>
+  <div class="book-info">
+    <h3 class="book-title">{title}</h3>
+    <p class="book-author">{author}</p>
+    <p class="book-meta">
+      <span class="book-status" data-status={status}>{STATUS_LABELS[status]}</span>
+      {rating && (
+        <span class="rating" role="img" aria-label={`التقييم ${rating} من 5`}>
+          {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+        </span>
+      )}
+      <time datetime={date.toISOString()}>{formatDate(date)}</time>
+    </p>
+    {downloadUrl && (
+      <a class="btn-dl" href={downloadUrl} target="_blank" rel="noopener noreferrer">رابط التحميل ↗</a>
+    )}
+    {hasOpinion && (
+      <details class="opinion">
+        <summary>رأيي في الكتاب</summary>
+        <div class="prose"><slot /></div>
+      </details>
+    )}
+    <TagList tags={tags} />
+  </div>
+</article>

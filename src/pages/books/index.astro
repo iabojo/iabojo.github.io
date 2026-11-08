@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BookCard from '../../components/BookCard.astro';
+import { cleanTags } from '../../lib/content';
+
+const books = (await getCollection('books', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const rendered = await Promise.all(
+  books.map(async (entry) => ({ entry, Content: (await entry.render()).Content })),
+);
+
+const shelves = [
+  { status: 'reading', label: 'أقرأ حاليًا' },
+  { status: 'finished', label: 'قرأتها' },
+  { status: 'wishlist', label: 'أريد قراءتها' },
+] as const;
+---
+
+<BaseLayout title="الكتب" description="الكتب والروايات التي قرأتها وما أقرؤه حاليًا، مع رأيي فيها.">
+  <h1>الكتب</h1>
+  {rendered.length === 0 && <p>لا توجد كتب بعد.</p>}
+  {shelves.map((shelf) => {
+    const list = rendered.filter(({ entry }) => entry.data.status === shelf.status);
+    return list.length > 0 && (
+      <section class="shelf" aria-labelledby={`shelf-${shelf.status}`}>
+        <h2 id={`shelf-${shelf.status}`}>{shelf.label} <span class="shelf-count">({list.length})</span></h2>
+        {list.map(({ entry, Content }) => (
+          <BookCard
+            slug={entry.slug}
+            title={entry.data.title}
+            author={entry.data.author}
+            status={entry.data.status}
+            cover={entry.data.cover}
+            downloadUrl={entry.data.downloadUrl}
+            rating={entry.data.rating}
+            date={entry.data.date}
+            tags={cleanTags(entry.data.tags)}
+            hasOpinion={entry.body.trim().length > 0}
+          >
+            <Content />
+          </BookCard>
+        ))}
+      </section>
+    );
+  })}
+</BaseLayout>

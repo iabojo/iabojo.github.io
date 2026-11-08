@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  getAllItems,
+  TYPE_ORDER,
+  TYPE_LABELS,
+  formatDate,
+  type Item,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const items = await getAllItems();
+  const tags = [...new Set(items.flatMap((i) => i.tags))];
+  return tags.map((tag) => ({
+    params: { tag },
+    props: { tag, items: items.filter((i) => i.tags.includes(tag)) },
+  }));
+}
+
+const { tag, items } = Astro.props as { tag: string; items: Item[] };
+
+const groups = TYPE_ORDER.map((type) => ({
+  type,
+  label: TYPE_LABELS[type],
+  list: items.filter((i) => i.type === type),
+})).filter((g) => g.list.length > 0);
+---
+
+<BaseLayout title={`#${tag}`} description={`كل المحتوى الموسوم بـ ${tag}.`}>
+  <h1>#{tag}</h1>
+  <p><a href="/tags/">← كل الوسوم</a></p>
+  {groups.map((group) => (
+    <section class="tag-group" aria-labelledby={`g-${group.type}`}>
+      <h2 id={`g-${group.type}`}>{group.label} <span class="shelf-count">({group.list.length})</span></h2>
+      <ul class="tag-results">
+        {group.list.map((item) => (
+          <li>
+            <a href={item.url}>{item.title}</a>
+            <time datetime={item.date.toISOString()}>{formatDate(item.date)}</time>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>

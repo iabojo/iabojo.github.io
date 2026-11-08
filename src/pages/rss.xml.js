@@ -1,19 +1,20 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import { getAllItems } from '../lib/content';
 
 export async function GET(context) {
-  const posts = (await getCollection('blog', ({ data }) => !data.draft))
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  const items = (await getAllItems())
+    .filter((i) => i.type === 'blog' || i.type === 'khawater')
+    .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
   return rss({
-    title: 'إلكترونية — مدونة abojo',
-    description: 'أنظمة BSD، أمن الشبكات، وتطبيقات أندرويد.',
+    title: 'مدونة أبو جو',
+    description: 'تدوينات وخواطر وقراءات، مع اهتمام بأنظمة BSD وأمن الشبكات.',
     site: context.site,
-    items: posts.map((post) => ({
-      title: post.data.title,
-      description: post.data.description,
-      pubDate: post.data.pubDate,
-      link: `/blog/${post.slug}/`,
+    items: items.map((item) => ({
+      title: item.title,
+      description: item.description ?? '',
+      pubDate: item.date,
+      link: item.url,
     })),
   });
 }

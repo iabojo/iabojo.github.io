@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import { cleanTags } from '../../lib/content';
+
+const entries = (await getCollection('khawater', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const rendered = await Promise.all(
+  entries.map(async (entry) => ({ entry, Content: (await entry.render()).Content })),
+);
+---
+
+<BaseLayout title="خواطر" description="خواطر وملاحظات قصيرة.">
+  <h1>خواطر</h1>
+  {rendered.length === 0 && <p>لا توجد خواطر بعد.</p>}
+  {rendered.map(({ entry, Content }) => (
+    <NoteCard
+      slug={entry.slug}
+      title={entry.data.title}
+      date={entry.data.pubDate}
+      tags={cleanTags(entry.data.tags)}
+    >
+      <Content />
+    </NoteCard>
+  ))}
+</BaseLayout>

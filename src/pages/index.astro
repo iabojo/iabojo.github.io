@@ -3,16 +3,28 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TerminalHero from '../components/TerminalHero.astro';
 import PostRow from '../components/PostRow.astro';
-import ProjectBlock from '../components/ProjectBlock.astro';
+import NoteCard from '../components/NoteCard.astro';
+import BookCard from '../components/BookCard.astro';
 import VideoCard from '../components/VideoCard.astro';
+import { cleanTags } from '../lib/content';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 4);
 
-const projects = (await getCollection('projects'))
-  .sort((a, b) => a.data.order - b.data.order)
+const notes = (await getCollection('khawater', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+const renderedNotes = await Promise.all(
+  notes.map(async (entry) => ({ entry, Content: (await entry.render()).Content })),
+);
+
+const reading = (await getCollection('books', ({ data }) => !data.draft && data.status === 'reading'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 2);
+const renderedReading = await Promise.all(
+  reading.map(async (entry) => ({ entry, Content: (await entry.render()).Content })),
+);
 
 const videos = (await getCollection('videos'))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
@@ -31,25 +43,51 @@ const videos = (await getCollection('videos'))
         title={post.data.title}
         description={post.data.description}
         pubDate={post.data.pubDate}
+        tags={cleanTags(post.data.tags)}
       />
     ))}
     <p style="margin-top:1.2rem"><a href="/blog/">كل التدوينات ←</a></p>
   </section>
 
-  <section aria-labelledby="featured-projects" style="margin-top:3.5rem">
-    <h2 id="featured-projects">مشاريع مختارة</h2>
-    {projects.map((project) => (
-      <ProjectBlock
-        title={project.data.title}
-        summary={project.data.summary}
-        stack={project.data.stack}
-        status={project.data.status}
-        repoUrl={project.data.repoUrl}
-        releaseUrl={project.data.releaseUrl}
-      />
-    ))}
-    <p style="margin-top:1rem"><a href="/projects/">كل المشاريع ←</a></p>
-  </section>
+  {renderedNotes.length > 0 && (
+    <section aria-labelledby="latest-notes" style="margin-top:3.5rem">
+      <h2 id="latest-notes">آخر الخواطر</h2>
+      {renderedNotes.map(({ entry, Content }) => (
+        <NoteCard
+          slug={entry.slug}
+          title={entry.data.title}
+          date={entry.data.pubDate}
+          tags={cleanTags(entry.data.tags)}
+        >
+          <Content />
+        </NoteCard>
+      ))}
+      <p style="margin-top:1rem"><a href="/khawater/">كل الخواطر ←</a></p>
+    </section>
+  )}
+
+  {renderedReading.length > 0 && (
+    <section aria-labelledby="now-reading" style="margin-top:3.5rem">
+      <h2 id="now-reading">أقرأ حاليًا</h2>
+      {renderedReading.map(({ entry, Content }) => (
+        <BookCard
+          slug={entry.slug}
+          title={entry.data.title}
+          author={entry.data.author}
+          status={entry.data.status}
+          cover={entry.data.cover}
+          downloadUrl={entry.data.downloadUrl}
+          rating={entry.data.rating}
+          date={entry.data.date}
+          tags={cleanTags(entry.data.tags)}
+          hasOpinion={entry.body.trim().length > 0}
+        >
+          <Content />
+        </BookCard>
+      ))}
+      <p style="margin-top:1rem"><a href="/books/">كل الكتب ←</a></p>
+    </section>
+  )}
 
   <section aria-labelledby="latest-videos" style="margin-top:3.5rem">
     <h2 id="latest-videos">آخر الفيديوهات</h2>

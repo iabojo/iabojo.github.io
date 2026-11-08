@@ -1,0 +1,91 @@
+media:
+  input: public/images
+  output: /images
+
+content:
+  - name: blog
+    label: التدوينات
+    type: collection
+    path: src/content/blog
+    format: yaml-frontmatter
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.md"
+    view:
+      fields: [title, pubDate]
+      primary: title
+      sort: [pubDate, title]
+      default:
+        sort: pubDate
+        order: desc
+    fields:
+      - { name: title, label: العنوان, type: string, required: true }
+      - { name: description, label: وصف مختصر, type: string }
+      - { name: pubDate, label: التاريخ, type: date, default: now, required: true }
+      - { name: tags, label: الوسوم, type: string, list: true }
+      - { name: draft, label: مسودة (لا تُنشر), type: boolean, default: false }
+      - { name: body, label: المحتوى, type: rich-text }
+
+  - name: khawater
+    label: خواطر
+    type: collection
+    path: src/content/khawater
+    format: yaml-frontmatter
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.md"
+    view:
+      fields: [pubDate, tags]
+      primary: pubDate
+      sort: [pubDate]
+      default:
+        sort: pubDate
+        order: desc
+    fields:
+      - { name: title, label: العنوان (اختياري), type: string, required: false }
+      - { name: pubDate, label: التاريخ, type: date, default: now, required: true }
+      - { name: tags, label: الوسوم, type: string, list: true }
+      - { name: draft, label: مسودة (لا تُنشر), type: boolean, default: false }
+      - { name: body, label: النص, type: rich-text }
+
+  - name: books
+    label: الكتب
+    type: collection
+    path: src/content/books
+    format: yaml-frontmatter
+    filename: "book-{year}{month}{day}-{hour}{minute}{second}.md"
+    view:
+      fields: [title, author, status]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - { name: title, label: عنوان الكتاب, type: string, required: true }
+      - { name: author, label: المؤلف, type: string, required: true }
+      - name: status
+        label: الحالة
+        type: select
+        default: finished
+        options:
+          values:
+            - { value: reading, label: أقرؤه حاليًا }
+            - { value: finished, label: قرأته }
+            - { value: wishlist, label: أريد قراءته }
+      - { name: cover, label: صورة الغلاف, type: image }
+      - { name: downloadUrl, label: رابط التحميل, type: string }
+      - { name: rating, label: التقييم (1-5), type: number, options: { min: 1, max: 5 } }
+      - { name: date, label: تاريخ الإضافة/الانتهاء, type: date, default: now, required: true }
+      - { name: tags, label: الوسوم, type: string, list: true }
+      - { name: draft, label: مسودة (لا تُنشر), type: boolean, default: false }
+      - { name: body, label: رأيي في الكتاب, type: rich-text }
+
+  - name: videos
+    label: الفيديوهات
+    type: collection
+    path: src/content/videos
+    format: yaml
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.yaml"
+    fields:
+      - { name: title, label: العنوان, type: string, required: true }
+      - { name: description, label: الوصف, type: string, required: true }
+      - { name: youtubeId, label: معرّف يوتيوب (الجزء بعد v=), type: string, required: true }
+      - { name: pubDate, label: التاريخ, type: date, default: now, required: true }
+      - { name: tags, label: الوسوم, type: string, list: true }

@@ -9,12 +9,24 @@ interface Props {
 
 const {
   title,
-  description = 'مدونة مدونة أبو جودي — أنظمة BSD، أمن الشبكات، وتطبيقات أندرويد.',
+  description = 'مدونة أبو جو — تدوينات وخواطر وقراءات، مع اهتمام بأنظمة BSD وأمن الشبكات.',
   ogImage = '/og-default.png',
 } = Astro.props;
 
-const pageTitle = title === 'الرئيسية' ? 'مدونة أبو جودي' : `${title} · مدونة أبو جودي`;
+const SITE_NAME = 'مدونة أبو جو';
+const pageTitle = title === 'الرئيسية' ? SITE_NAME : `${title} · ${SITE_NAME}`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+const nav = [
+  { href: '/', label: 'الرئيسية' },
+  { href: '/blog/', label: 'المدونة' },
+  { href: '/khawater/', label: 'خواطر' },
+  { href: '/books/', label: 'الكتب' },
+  { href: '/videos/', label: 'الفيديوهات' },
+  { href: '/tags/', label: 'الوسوم' },
+];
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
 ---
 
 <!doctype html>
@@ -24,6 +36,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="canonical" href={canonicalURL} />
+  <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
   <title>{pageTitle}</title>
   <meta name="description" content={description} />
 
@@ -46,12 +59,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <body>
   <header class="site-header">
     <div class="wrap bar">
-      <a href="/" class="brand">مدونة أبو جودي <span aria-hidden="true" style="direction:ltr">// @iabojo</span></a>
+      <a href="/" class="brand">{SITE_NAME} <span aria-hidden="true" style="direction:ltr">// @iabojo</span></a>
       <nav class="main-nav" aria-label="التصفح الرئيسي">
-        <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>الرئيسية</a>
-        <a href="/blog/" aria-current={Astro.url.pathname.startsWith('/blog') ? 'page' : undefined}>المدونة</a>
-        <a href="/projects/" aria-current={Astro.url.pathname.startsWith('/projects') ? 'page' : undefined}>المشاريع</a>
-        <a href="/videos/" aria-current={Astro.url.pathname.startsWith('/videos') ? 'page' : undefined}>الفيديوهات</a>
+        {nav.map((item) => (
+          <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+        ))}
       </nav>
     </div>
   </header>

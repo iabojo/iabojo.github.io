@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllItems, TYPE_ORDER, TYPE_LABELS, tagUrl, type ItemType } from '../../lib/content';
+
+const items = await getAllItems();
+
+const stats = new Map<string, { total: number; byType: Partial<Record<ItemType, number>> }>();
+for (const item of items) {
+  for (const tag of item.tags) {
+    const s = stats.get(tag) ?? { total: 0, byType: {} };
+    s.total += 1;
+    s.byType[item.type] = (s.byType[item.type] ?? 0) + 1;
+    stats.set(tag, s);
+  }
+}
+
+const tags = [...stats.entries()].sort(
+  (a, b) => b[1].total - a[1].total || a[0].localeCompare(b[0], 'ar'),
+);
+---
+
+<BaseLayout title="الوسوم" description="تصفح كل المحتوى حسب الوسم.">
+  <h1>الوسوم</h1>
+  {tags.length === 0 ? (
+    <p>لا توجد وسوم بعد.</p>
+  ) : (
+    <ul class="tag-index">
+      {tags.map(([tag, s]) => (
+        <li>
+          <a class="tag" href={tagUrl(tag)}>#{tag}</a>
+          <span class="tag-count">{s.total}</span>
+          <span class="tag-breakdown">
+            {TYPE_ORDER.filter((t) => s.byType[t])
+              .map((t) => `${TYPE_LABELS[t]} ${s.byType[t]}`)
+              .join(' · ')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

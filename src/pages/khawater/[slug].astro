@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import { cleanTags, excerpt } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('khawater', ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={entry.data.title ?? 'خاطرة'} description={excerpt(entry.body, 160) || undefined}>
+  <NoteCard
+    slug={entry.slug}
+    title={entry.data.title}
+    date={entry.data.pubDate}
+    tags={cleanTags(entry.data.tags)}
+    heading="h1"
+  >
+    <Content />
+  </NoteCard>
+  <p style="margin-top:1.5rem"><a href="/khawater/">← كل الخواطر</a></p>
+</BaseLayout>

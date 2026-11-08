@@ -1,24 +1,23 @@
 ---
+import TagList from './TagList.astro';
+import { formatDate } from '../lib/content';
+
 interface Props {
   slug: string;
   title: string;
-  description: string;
+  description?: string;
   pubDate: Date;
+  tags?: string[];
 }
-const { slug, title, description, pubDate } = Astro.props;
-
-const formatted = new Intl.DateTimeFormat('ar-EG-u-nu-latn', {
-  year: 'numeric',
-  month: 'short',
-  day: '2-digit',
-}).format(pubDate);
+const { slug, title, description = '', pubDate, tags = [] } = Astro.props;
 ---
 
 <article class="post-row">
   <span class="perm">-rw-r--r--</span>
   <span class="title">
     <a href={`/blog/${slug}/`}>{title}</a>
-    <span class="meta">{description}</span>
+    {description && <span class="meta">{description}</span>}
+    <TagList tags={tags} />
   </span>
-  <time class="date" datetime={pubDate.toISOString()}>{formatted}</time>
+  <time class="date" datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
 </article>
