@@ -1,6 +1,6 @@
 ---
 title: "1984"
-author: اسم جورج اوريل
+author: جورج أوريل
 status: finished
 cover: /images/1984.jpg
 rating: 3
